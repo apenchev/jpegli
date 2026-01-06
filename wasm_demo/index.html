@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WASM Demo</title>
+</head>
+<body>
+
+<input id="fileInput" type="file" accept="image/*">
+<p><img id="fileOutput"></p>
+
+<script src="cjpegli.js"></script>
+<script>
+fileInput.onchange = (ev) => {
+  const file = fileInput.files[0]
+  const t0 = performance.now()
+  createImageBitmap(file).then(bitmap => {
+    const t1 = performance.now()
+    let { width, height } = bitmap
+
+    const canvas = document.createElement("canvas")
+    canvas.width = width
+    canvas.height = height
+
+    const ctx = canvas.getContext("2d")
+    ctx.drawImage(bitmap, 0, 0)
+    bitmap.close()
+
+    const imageData = ctx.getImageData(0, 0, width, height)
+    const inputPtr = _malloc(imageData.data.length)
+
+    HEAPU8.set(imageData.data, inputPtr)
+
+    const outputPtr = _encode(
+      inputPtr,
+      width,
+      height,
+      420, // chroma_subsampling        444|440|422|420
+      90,  // quality                   1 .. 100
+      2,   // progressive_level         0|1|2
+      0,   // optimize_coding           0|1
+      1,   // use_adaptive_quantization 0|1
+      0    // use_std_quant_tables      0|1
+    )
+    const size = _get_size()
+    const view = new Uint8Array(HEAPU8.buffer, outputPtr, size)
+    const blob = new Blob([view], { type: "image/jpeg" })
+
+    const t2 = performance.now()
+    console.log("createImageBitmap:", t1 - t0, "encode:", t2 - t1)
+    fileOutput.src = URL.createObjectURL(blob)
+  })
+}
+</script>
+</body>
+</html>

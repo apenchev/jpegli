@@ -321,7 +321,7 @@ cmake_configure() {
     # These are not enabled by default in cmake.
     -DJPEGXL_ENABLE_VIEWERS=ON
     -DJPEGXL_ENABLE_PLUGINS=ON
-    -DJPEGXL_ENABLE_DEVTOOLS=ON
+    -DJPEGXL_ENABLE_DEVTOOLS=OFF
     # We always use libfuzzer in the ci.sh wrapper.
     -DJPEGXL_FUZZER_LINK_FLAGS="-fsanitize=fuzzer"
   )

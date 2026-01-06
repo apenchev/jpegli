@@ -81,9 +81,9 @@ if(JPEGXL_ENABLE_TOOLS)
   # jpegli is enabled.
   add_executable(cjpegli cjpegli.cc)
   target_link_libraries(cjpegli jpegli-static)
-  add_executable(djpegli djpegli.cc)
-  target_link_libraries(djpegli jpegli-static)
-  list(APPEND INTERNAL_TOOL_BINARIES cjpegli djpegli)
+  #add_executable(djpegli djpegli.cc)
+  #target_link_libraries(djpegli jpegli-static)
+  list(APPEND INTERNAL_TOOL_BINARIES cjpegli)
 endif()  # JPEGXL_ENABLE_TOOLS
 
 # Other developer tools.
@@ -149,6 +149,11 @@ foreach(BINARY IN LISTS TOOL_BINARIES)
     set(JXL_WASM_TOOLS_LINK_FLAGS "\
       -s USE_LIBPNG=1 \
       -s ALLOW_MEMORY_GROWTH=1 \
+      -s EXPORTED_FUNCTIONS=_malloc,_free,_encode,_get_size \
+      -s STANDALONE_WASM=1 \
+      -s ENVIRONMENT=web \
+      -s MALLOC=emmalloc \
+      --no-entry \
     ")
     if (JPEGXL_ENABLE_WASM_THREADS)
       set(JXL_WASM_TOOLS_LINK_FLAGS "${JXL_WASM_TOOLS_LINK_FLAGS} \
