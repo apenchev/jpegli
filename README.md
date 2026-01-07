@@ -1,34 +1,73 @@
 # A web-friendly WASM build of jpegli
 
-This repository contains a JPEG encoder and decoder implementation that is
-API and ABI compatible with libjpeg62.
+## Build steps (Linux, tested on Ubuntu)
 
-## Usage
+* Install build tools dependencies:
 
-Building stpes Ubuntu/Debian (including WSL2 on Windows):
+```bash
+sudo apt install cmake doxygen ninja-build libgimp2.0-dev
+```
 
-* Install dependencies by running:
-  
-      sudo ./deps.sh
+* [Emscripten SDK](https://emscripten.org/) is required for building
+WebAssembly artifacts. To install it, follow the
+[Download and Install](https://emscripten.org/docs/getting_started/downloads.html)
+guide:
 
-* Install CMake and Emscripten SDK by following the instructions on https://github.com/apenchev/jpegli/blob/main/doc/building_wasm.md but <ins>DO NOT RUN</ins> the last step in the docs:
+```bash
+cd $OPT
 
-      BUILD_TARGET=wasm32 emconfigure ./ci.sh release
+# Get the emsdk repo.
+git clone https://github.com/emscripten-core/emsdk.git
 
-      BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 emconfigure ./ci.sh release
+# Enter that directory.
+cd emsdk
 
-* Instead, you first need to log on as root with:
+# Download and install the latest SDK tools.
+./emsdk install latest
 
-      sudo su
+# Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
+./emsdk activate latest
+```
 
-* Onced logged on as root, you need to configure the Emscripten SDK again with:
+* Clone this repo and install its dependencies:
 
-      source $OPT/emsdk/emsdk_env.sh
+```bash
+cd $OPT
 
-* Finally, you can run the build step:
+# Get the jpegli repo.
+git clone https://github.com/apenchev/jpegli.git
 
-      BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 SKIP_TEST=1 emconfigure ./ci.sh release
+# Enter that directory.
+cd jpegli
+
+# Download and install dependencies.
+sudo ./deps.sh
+```
+
+* Eeach time before building jpegli, you need to login as root and set up the emsdk environment:
+
+```bash
+cd $OPT
+
+# Login as root
+sudo su
+
+# Set up emsdk environment.
+source emsdk/emsdk_env.sh
+
+# Enter the jpegli directory.
+cd jpegli
+
+# Build jpegli.
+BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 SKIP_TEST=1 emconfigure ./ci.sh release
+```
+
+* Once the build is finished, you can log out from root:
+
+```bash
+exit
+```
 
 * You should get both cjpegli.wasm and cjpegli.js inside of the /build-wasm32/tools/ folder
-
-* You can copy cjpegli.wasm and cjpegli.js inside of the /wasm_demo/ folder and test if the encode works by running /wasm_demo/index.html ON A SERVER - if not running on a local server (such as Apache), the browser content policy will refuse to load the .wasm
+* You can copy cjpegli.wasm and cjpegli.js inside of the /wasm_demo/ folder and test the encoder by running /wasm_demo/index.html
+* index.html MUST RUN BE ON A LOCAL SERVER (http://localhost/), otherwise the browser content policy will refuse to load the .wasm file
