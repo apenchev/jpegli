@@ -70,4 +70,4 @@ exit
 
 * You should get both cjpegli.wasm and cjpegli.js inside of the /build-wasm32/tools/ folder
 * You can copy cjpegli.wasm and cjpegli.js to the /wasm_demo/ folder and test the encoder by running /wasm_demo/index.html
-* index.html MUST RUN BE ON A LOCAL SERVER (http://localhost/), otherwise the browser content policy will refuse to load the .wasm file
+* index.html MUST BE RUN ON A LOCAL SERVER (http://localhost/), otherwise the browser content policy will refuse to load the .wasm file
