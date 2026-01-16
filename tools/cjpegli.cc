@@ -1,7 +1,17 @@
 #include <cstdint>
 #include <cstdlib>
 
+#include "lib/base/types.h"
 #include "lib/jpegli/encode.h"
+
+struct WasmJpegSettings {
+  int chroma_subsampling;
+  int quality;
+  int progressive_level;
+  bool optimize_coding;
+  bool use_adaptive_quantization;
+  bool use_std_quant_tables;
+};
 
 void MyErrorExit(j_common_ptr cinfo) {
   (*cinfo->err->output_message)(cinfo);
@@ -19,10 +29,19 @@ uint8_t* encode(
   int chroma_subsampling,
   int quality,
   int progressive_level,
-  int optimize_coding,
-  int use_adaptive_quantization,
-  int use_std_quant_tables
+  bool optimize_coding,
+  bool use_adaptive_quantization,
+  bool use_std_quant_tables
 ) {
+  WasmJpegSettings jpeg_settings = {
+    chroma_subsampling,
+    quality,
+    progressive_level,
+    optimize_coding,
+    use_adaptive_quantization,
+    use_std_quant_tables
+  };
+
   uint8_t* output_buffer;
   size_t output_size;
 
@@ -37,22 +56,21 @@ uint8_t* encode(
   cinfo.image_height = height;
   cinfo.input_components = 4;
   cinfo.in_color_space = JCS_EXT_RGBA;
-  if (use_std_quant_tables) {
+  if (jpeg_settings.use_std_quant_tables) {
     jpegli_use_standard_quant_tables(&cinfo);
   }
 
   jpegli_set_defaults(&cinfo);
-  jpegli_set_colorspace(&cinfo, JCS_YCbCr);
-  if (chroma_subsampling == 444) {
+  if (jpeg_settings.chroma_subsampling == 444) {
     cinfo.comp_info[0].h_samp_factor = 1;
     cinfo.comp_info[0].v_samp_factor = 1;
-  } else if (chroma_subsampling == 440) {
+  } else if (jpeg_settings.chroma_subsampling == 440) {
     cinfo.comp_info[0].h_samp_factor = 1;
     cinfo.comp_info[0].v_samp_factor = 2;
-  } else if (chroma_subsampling == 422) {
+  } else if (jpeg_settings.chroma_subsampling == 422) {
     cinfo.comp_info[0].h_samp_factor = 2;
     cinfo.comp_info[0].v_samp_factor = 1;
-  } else if (chroma_subsampling == 420) {
+  } else if (jpeg_settings.chroma_subsampling == 420) {
     cinfo.comp_info[0].h_samp_factor = 2;
     cinfo.comp_info[0].v_samp_factor = 2;
   }
@@ -61,14 +79,15 @@ uint8_t* encode(
     cinfo.comp_info[i].v_samp_factor = 1;
   }
 
-  jpegli_enable_adaptive_quantization(&cinfo, use_adaptive_quantization);
-  float distance = jpegli_quality_to_distance(quality);
-  jpegli_set_distance(&cinfo, distance, 1);
-  jpegli_set_progressive_level(&cinfo, progressive_level);
-  cinfo.optimize_coding = optimize_coding;
+  jpegli_enable_adaptive_quantization(
+      &cinfo, TO_JXL_BOOL(jpeg_settings.use_adaptive_quantization));
+  float distance = jpegli_quality_to_distance(jpeg_settings.quality);
+  jpegli_set_distance(&cinfo, distance, TRUE);
+  jpegli_set_progressive_level(&cinfo, jpeg_settings.progressive_level);
+  cinfo.optimize_coding = TO_JXL_BOOL(jpeg_settings.optimize_coding);
 
   jpegli_set_input_format(&cinfo, JPEGLI_TYPE_UINT8, JPEGLI_NATIVE_ENDIAN);
-  jpegli_start_compress(&cinfo, 1);
+  jpegli_start_compress(&cinfo, TRUE);
 
   JSAMPROW row[1];
   int stride = cinfo.image_width * cinfo.input_components;
@@ -79,8 +98,8 @@ uint8_t* encode(
 
   jpegli_finish_compress(&cinfo);
   jpegli_destroy_compress(&cinfo);
+  if (input_buffer) free(input_buffer);
 
-  free(input_buffer);
   size_arr[0] = output_size;
   return output_buffer;
 }
