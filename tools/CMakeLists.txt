@@ -151,7 +151,7 @@ foreach(BINARY IN LISTS TOOL_BINARIES)
       -s ALLOW_MEMORY_GROWTH=1 \
       -s EXPORTED_FUNCTIONS=_malloc,_free,_encode,_get_size \
       -s STANDALONE_WASM=1 \
-      -s ENVIRONMENT=web \
+      -s ENVIRONMENT=web,node \
       -s MALLOC=emmalloc \
       --no-entry \
     ")
