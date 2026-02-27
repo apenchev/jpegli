@@ -5,7 +5,7 @@
 * Install build tools dependencies:
 
 ```bash
-sudo apt install cmake doxygen ninja-build pkgconf
+sudo apt install cmake ninja-build pkgconf
 ```
 
 * [Emscripten SDK](https://emscripten.org/) is required for building
