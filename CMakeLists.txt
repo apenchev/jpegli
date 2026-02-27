@@ -126,7 +126,7 @@ set(JPEGLI_LIBJPEG_LIBRARY_VERSION "62.3.0" CACHE STRING
     "Library version of the libjpeg.so shared library that we build.")
 set(JPEGLI_LIBJPEG_LIBRARY_SOVERSION "62" CACHE STRING
     "Library so-version of the libjpeg.so shared library that we build.")
-set(JPEGXL_ENABLE_DOXYGEN true CACHE BOOL
+set(JPEGXL_ENABLE_DOXYGEN false CACHE BOOL
     "Generate C API documentation using Doxygen.")
 set(JPEGXL_ENABLE_MANPAGES false CACHE BOOL
     "Build and install man pages for the command-line tools.")
