@@ -142,17 +142,17 @@ set(JPEGLI_LIBJPEG_LIBRARY_SOVERSION "62" CACHE STRING
     "Library so-version of the libjpeg.so shared library that we build.")
 set(JPEGXL_ENABLE_DOXYGEN true CACHE BOOL
     "Generate C API documentation using Doxygen.")
-set(JPEGXL_ENABLE_MANPAGES true CACHE BOOL
+set(JPEGXL_ENABLE_MANPAGES false CACHE BOOL
     "Build and install man pages for the command-line tools.")
-set(JPEGXL_ENABLE_BENCHMARK true CACHE BOOL
+set(JPEGXL_ENABLE_BENCHMARK false CACHE BOOL
     "Build JPEGXL benchmark tools.")
 set(JPEGXL_BUNDLE_LIBPNG ${BUNDLE_LIBPNG_DEFAULT} CACHE BOOL
     "Build libpng from source and link it statically.")
-set(JPEGXL_ENABLE_JNI true CACHE BOOL
+set(JPEGXL_ENABLE_JNI false CACHE BOOL
     "Build JPEGXL JNI Java wrapper, if Java dependencies are installed.")
-set(JPEGXL_ENABLE_SJPEG true CACHE BOOL
+set(JPEGXL_ENABLE_SJPEG false CACHE BOOL
     "Build JPEGXL with support for encoding with sjpeg.")
-set(JPEGXL_ENABLE_OPENEXR true CACHE BOOL
+set(JPEGXL_ENABLE_OPENEXR false CACHE BOOL
     "Build JPEGXL with support for OpenEXR if available.")
 set(JPEGXL_ENABLE_SKCMS ${ENABLE_SKCMS_DEFAULT} CACHE BOOL
     "Build with skcms instead of lcms2.")
@@ -170,7 +170,7 @@ set(JPEGXL_FORCE_NEON false CACHE BOOL
     "Set flags to enable NEON in arm if not enabled by your toolchain.")
 set(JPEGXL_TEST_TOOLS false CACHE BOOL
     "Run scripts that test the encoding / decoding tools.")
-set(JPEGXL_ENABLE_WASM_THREADS true CACHE BOOL
+set(JPEGXL_ENABLE_WASM_THREADS false CACHE BOOL
     "Builds WASM modules with threads support.")
 set(JPEGXL_ENABLE_LTO false CACHE BOOL
     "Set flags to enable LTO.")
