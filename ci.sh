@@ -33,7 +33,7 @@ CMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM:-}
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SKIP_TEST="${SKIP_TEST:-0}"
 FASTER_MSAN_BUILD="${FASTER_MSAN_BUILD:-0}"
-TARGETS="${TARGETS:-all doc}"
+TARGETS="${TARGETS:-all}"
 TEST_SELECTOR="${TEST_SELECTOR:-}"
 BUILD_TARGET="${BUILD_TARGET:-}"
 ENABLE_WASM_SIMD="${ENABLE_WASM_SIMD:-0}"
@@ -326,7 +326,7 @@ cmake_configure() {
     # These are not enabled by default in cmake.
     -DJPEGXL_ENABLE_VIEWERS=ON
     -DJPEGXL_ENABLE_PLUGINS=ON
-    -DJPEGXL_ENABLE_DEVTOOLS=ON
+    -DJPEGXL_ENABLE_DEVTOOLS=OFF
     # We always use libfuzzer in the ci.sh wrapper.
     -DJPEGXL_FUZZER_LINK_FLAGS="-fsanitize=fuzzer"
   )
