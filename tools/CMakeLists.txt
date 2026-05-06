@@ -86,7 +86,7 @@ if(JPEGLI_ENABLE_TOOLS)
   #add_executable(djpegli djpegli.cc)
   #target_link_libraries(djpegli jpegli-static)
   list(APPEND INTERNAL_TOOL_BINARIES cjpegli)
-endif()  # JPEGXL_ENABLE_TOOLS
+endif()  # JPEGLI_ENABLE_TOOLS
 
 # Other developer tools.
 if(JPEGLI_ENABLE_DEVTOOLS)
