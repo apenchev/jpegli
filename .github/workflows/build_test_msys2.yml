@@ -38,7 +38,7 @@ jobs:
            disable_tests:
              - ButteraugliTest.Lossless
              - ButteraugliTest.Distmap
-             - JxlTest.RoundtripLargeEmptyModular
+             - JpegliTest.RoundtripLargeEmptyModular
            disable_benchmark: true
          # "Legacy" toolchains are being "phased-out":
          # https://www.msys2.org/news/#2023-12-13-starting-to-drop-some-32-bit-packages
@@ -51,7 +51,7 @@ jobs:
         shell: msys2 {0}
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@58077d3c7e43986b6b15fba718e8ea69e387dfcc # v2.15.1
+        uses: step-security/harden-runner@8d3c67de8e2fe68ef647c8db1e6a09f647780f40 # v2.19.0
         with:
           egress-policy: audit
 
@@ -71,7 +71,6 @@ jobs:
             git
             procps
           pacboy: >-
-            brotli:p
             cmake:p
             giflib:p
             gtest:p
@@ -86,10 +85,9 @@ jobs:
         run: |
           cmake \
             -DCMAKE_BUILD_TYPE=Release \
-            -DJPEGXL_ENABLE_JNI=OFF \
-            -DJPEGXL_ENABLE_MANPAGES=OFF \
-            -DJPEGXL_FORCE_SYSTEM_BROTLI=ON \
-            -DJPEGXL_FORCE_SYSTEM_GTEST=ON \
+            -DJPEGLI_ENABLE_JNI=OFF \
+            -DJPEGLI_ENABLE_MANPAGES=OFF \
+            -DJPEGLI_FORCE_SYSTEM_GTEST=ON \
             -B build \
             -G Ninja
 
