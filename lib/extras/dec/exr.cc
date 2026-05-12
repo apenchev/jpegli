@@ -332,16 +332,19 @@ Status DecodeImageEXR(Span<const uint8_t> bytes, const ColorHints& color_hints,
     }
 
     // Setup framebuffer: extra channels
-    char* extra_rows_ptr =
-        input_extra_rows.data() -
-        (dataWindow.min.x + start_y * row_size) * extraPixelBytes;
+    char* extra_rows_ptr = input_extra_rows.data();
     for (OpenEXR::ChannelList::ConstIterator it = channels.begin();
          it != channels.end(); ++it) {
       if (extraChannels.find(&it.channel()) == extraChannels.end()) {
         continue;
       }
       const size_t size = it.channel().type == OpenEXR::HALF ? 2 : 4;
-      fb.insert(it.name(), OpenEXR::Slice(it.channel().type, extra_rows_ptr,
+      // Compute per-channel virtual base pointer using per-channel stride (not
+      // extraPixelBytes) to avoid underflow when dataWindow.min.x > 0 with
+      // multiple extra channels.
+      char* ch_base_ptr =
+          extra_rows_ptr - (dataWindow.min.x + start_y * row_size) * size;
+      fb.insert(it.name(), OpenEXR::Slice(it.channel().type, ch_base_ptr,
                                           size, size * row_size));
       extra_rows_ptr += size * row_size * (end_y - start_y + 1);
     }
@@ -351,36 +354,37 @@ Status DecodeImageEXR(Span<const uint8_t> bytes, const ColorHints& color_hints,
     input.readPixels(start_y, end_y);
 
     // Copy read data into the result image
-    for (int exr_y = start_y; exr_y <= end_y; ++exr_y) {
-      const int image_y = exr_y - displayWindow.min.y;
-      const char* const JPEGLI_RESTRICT input_row =
-          &input_rows[(exr_y - start_y) * colorPixelBytes * row_size];
-      uint8_t* row = static_cast<uint8_t*>(frame.color.pixels()) +
-                     frame.color.stride * image_y;
+    const int exr_x1 = std::max(dataWindow.min.x, displayWindow.min.x);
+    const int exr_x2 = std::min(dataWindow.max.x, displayWindow.max.x);
+    const int exr_x_span = std::max(0, exr_x2 - exr_x1 + 1);
+    if (exr_x_span > 0) {
+      for (int exr_y = start_y; exr_y <= end_y; ++exr_y) {
+        const int image_y = exr_y - displayWindow.min.y;
+        const char* const JPEGLI_RESTRICT input_row =
+            &input_rows[(exr_y - start_y) * colorPixelBytes * row_size];
+        uint8_t* row = static_cast<uint8_t*>(frame.color.pixels()) +
+                       frame.color.stride * image_y;
 
-      const int exr_x1 = std::max(dataWindow.min.x, displayWindow.min.x);
-      const int exr_x2 = std::min(dataWindow.max.x, displayWindow.max.x);
+        const char* exr_ptr =
+            input_row + (exr_x1 - dataWindow.min.x) * colorPixelBytes;
+        uint8_t* image_ptr =
+            row + (exr_x1 - displayWindow.min.x) * colorPixelBytes;
+        memcpy(image_ptr, exr_ptr, exr_x_span * colorPixelBytes);
 
-      const char* exr_ptr =
-          input_row + (exr_x1 - dataWindow.min.x) * colorPixelBytes;
-      uint8_t* image_ptr =
-          row + (exr_x1 - displayWindow.min.x) * colorPixelBytes;
-      memcpy(image_ptr, exr_ptr, (exr_x2 - exr_x1 + 1) * colorPixelBytes);
+        const char* JPEGLI_RESTRICT input_ec_slice = input_extra_rows.data();
+        for (PackedImage& ec : frame.extra_channels) {
+          const char* const JPEGLI_RESTRICT input_ec_row =
+              input_ec_slice + (exr_y - start_y) * ec.stride;
+          uint8_t* ec_row =
+              static_cast<uint8_t*>(ec.pixels()) + ec.stride * image_y;
+          input_ec_slice += ec.stride * (end_y - start_y + 1);
 
-      const char* JPEGLI_RESTRICT input_ec_slice = input_extra_rows.data();
-      for (PackedImage& ec : frame.extra_channels) {
-        const char* const JPEGLI_RESTRICT input_ec_row =
-            input_ec_slice + (exr_y - start_y) * ec.stride;
-        uint8_t* ec_row =
-            static_cast<uint8_t*>(ec.pixels()) + ec.stride * image_y;
-        input_ec_slice += ec.stride * (end_y - start_y + 1);
-
-        const char* exr_ec_ptr =
-            input_ec_row + (exr_x1 - dataWindow.min.x) * ec.pixel_stride();
-        uint8_t* image_ec_ptr =
-            ec_row + (exr_x1 - displayWindow.min.x) * ec.pixel_stride();
-        memcpy(image_ec_ptr, exr_ec_ptr,
-               (exr_x2 - exr_x1 + 1) * ec.pixel_stride());
+          const char* exr_ec_ptr =
+              input_ec_row + (exr_x1 - dataWindow.min.x) * ec.pixel_stride();
+          uint8_t* image_ec_ptr =
+              ec_row + (exr_x1 - displayWindow.min.x) * ec.pixel_stride();
+          memcpy(image_ec_ptr, exr_ec_ptr, exr_x_span * ec.pixel_stride());
+        }
       }
     }
   }
