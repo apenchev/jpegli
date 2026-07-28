@@ -23,10 +23,10 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 
 # Download and install the latest SDK tools.
-./emsdk install latest
+./emsdk install 6.0.2
 
 # Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate latest
+./emsdk activate 6.0.2
 ```
 
 * Clone this repo and install its dependencies:
@@ -49,9 +49,6 @@ sudo ./deps.sh
 ```bash
 cd $OPT
 
-# Login as root
-sudo su
-
 # Set up emsdk environment.
 source emsdk/emsdk_env.sh
 
@@ -60,12 +57,6 @@ cd jpegli
 
 # Build jpegli.
 BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 SKIP_TEST=1 emconfigure ./ci.sh release
-```
-
-* Once the build is finished, you can log out from root:
-
-```bash
-exit
 ```
 
 * You should get both cjpegli.wasm and cjpegli.js inside of the /build-wasm32/tools/ folder
