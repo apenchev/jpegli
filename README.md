@@ -41,7 +41,7 @@ git clone https://github.com/apenchev/jpegli.git
 cd jpegli
 
 # Download and install dependencies.
-sudo ./deps.sh
+./deps.sh
 ```
 
 * Each time before building jpegli, you need to login as root and set up the emsdk environment:
