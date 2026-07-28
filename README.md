@@ -1,6 +1,6 @@
 # A web-friendly WASM build of jpegli
 
-## Build steps (Linux, tested on Ubuntu)
+## Linux/WSL build steps (tested on Ubuntu 26.04)
 
 * Install build tools dependencies:
 
