@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WASM Demo</title>
+</head>
+<body>
+
+<input id="fileInput" type="file" accept="image/*">
+<p><img id="fileOutput"></p>
+
+<script src="cjpegli.js"></script>
+<script>
+fileInput.onchange = (ev) => {
+  const file = fileInput.files[0]
+  const reader = new FileReader()
+  const t0 = performance.now()
+
+  reader.addEventListener("load", () => {
+    const img = new Image()
+    img.onload = () => imageLoaded(img, t0)
+    img.src = reader.result
+  });
+
+  if (file) {
+    reader.readAsDataURL(file)
+  }
+}
+
+function imageLoaded(img, t0) {
+  const canvas = new OffscreenCanvas(img.width, img.height)
+  const ctx = canvas.getContext("2d")
+  ctx.drawImage(img, 0, 0)
+  const image = ctx.getImageData(0, 0, img.width, img.height)
+  const t1 = performance.now()
+
+  const p = _malloc(image.data.length)
+  HEAPU8.set(image.data, p)
+  const resultPointer = _encode(p, img.width, img.height, 420, 90, 2, 0, 1, 0)
+  const resultSize = _get_size()
+  const resultView = new Uint8Array(HEAPU8.buffer, resultPointer, resultSize)
+  const result = new Uint8Array(resultView)
+  _free(resultPointer)
+  _free(p)
+
+  const blob = new Blob([result], {type: "image/jpeg"})
+  const blobURL = URL.createObjectURL(blob)
+  const t2 = performance.now()
+  console.log("total:", t2 - t0, "getImageData:", t1 - t0, "jpegli:", t2 - t1)
+  fileOutput.src = blobURL
+}
+</script>
+</body>
+</html>
