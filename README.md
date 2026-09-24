@@ -1,6 +1,6 @@
 # A web-friendly WASM build of jpegli
 
-## Linux/WSL build steps (tested on Ubuntu 26.04)
+## Linux/WSL 2 build steps (tested on Ubuntu 26.04)
 
 * Install build tools dependencies:
 
@@ -14,6 +14,7 @@ WebAssembly artifacts. To install it, follow the
 guide:
 
 ```bash
+# Enter the home directory.
 cd $OPT
 
 # Get the emsdk repo.
@@ -32,6 +33,7 @@ cd emsdk
 * Clone this repo and install its dependencies:
 
 ```bash
+# Enter the home directory.
 cd $OPT
 
 # Get the jpegli repo.
@@ -44,9 +46,10 @@ cd jpegli
 ./deps.sh
 ```
 
-* Each time before building jpegli, you need to login as root and set up the emsdk environment:
+* Each time before building jpegli, you need to set up the emsdk environment beforehand:
 
 ```bash
+# Enter the home directory.
 cd $OPT
 
 # Set up emsdk environment.
@@ -59,6 +62,6 @@ cd jpegli
 BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 SKIP_TEST=1 emconfigure ./ci.sh release
 ```
 
-* You should get both cjpegli.wasm and cjpegli.js inside of the /build-wasm32/tools/ folder
-* You can copy cjpegli.wasm and cjpegli.js to the /wasm_demo/ folder and test the encoder by running /wasm_demo/index.html
-* index.html MUST BE RUN ON A SERVER (such as http://localhost/), otherwise the browser's content policy will refuse to load the .wasm file
+* Both *cjpegli.wasm* and *cjpegli.js* will be generated inside of /build-wasm32/tools/
+* You can copy both *cjpegli.wasm* and *cjpegli.js* into the /wasm_demo/ folder to test the jpegli encoder
+* /wasm_demo/index.html must be served from a server (such as http://localhost/) or the browser's security policy will refuse to load *cjpegli.wasm*
