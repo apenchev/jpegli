@@ -23,10 +23,10 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 
 # Download and install the latest SDK tools.
-./emsdk install 6.0.2
+./emsdk install latest
 
-# Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate 6.0.2
+# Make the "latest" SDK "active" for the current user. (writes .emscripten file)
+./emsdk activate latest
 ```
 
 * Clone this repo and install its dependencies:
