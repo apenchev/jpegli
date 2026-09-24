@@ -62,6 +62,6 @@ cd jpegli
 BUILD_TARGET=wasm32 ENABLE_WASM_SIMD=1 SKIP_TEST=1 emconfigure ./ci.sh release
 ```
 
-* Both *cjpegli.wasm* and *cjpegli.js* will be generated inside of /build-wasm32/tools/
-* You can copy both *cjpegli.wasm* and *cjpegli.js* into the /wasm_demo/ folder to test the jpegli encoder
-* /wasm_demo/index.html must be served from a server (such as http://localhost/) or the browser's security policy will refuse to load *cjpegli.wasm*
+* Both `/build-wasm32/tools/cjpegli.wasm` and `/build-wasm32/tools/cjpegli.js` will be generated
+* You can copy both files into the `/wasm_demo/` folder to start testing `cjpegli.wasm`
+* Load `/wasm_demo/index.html` from a server (like http://localhost/wasm_demo/) or the browser's security policy will refuse to load *cjpegli.wasm*
